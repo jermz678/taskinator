@@ -43,7 +43,8 @@ var taskFormHandler = function(event) {
         var taskDataObj = {
          name: taskNameInput,
         type: taskTypeInput
-    }};
+    }
+    };
   
     createTaskEl(taskDataObj);
   };
