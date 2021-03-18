@@ -11,7 +11,6 @@ var taskFormHandler = function(event) {
     event.preventDefault();
     var taskNameInput = document.querySelector("input[name='task-name']").value;
     var taskTypeInput = document.querySelector("select[name='task-type']").value;
-
     //check if input values are empty strings
     if(!taskNameInput || !taskTypeInput){
         alert("You need to fill out the task form!");
@@ -25,36 +24,33 @@ var taskFormHandler = function(event) {
         name: taskNameInput,
         type: taskTypeInput,
         status: "to do"
-      }
+    }
     
-
     var isEdit = formEl.hasAttribute("data-task-id");
     
-
-    //send it as an argument to createTaskEl
+    
     
     // has data attribute, so get task id and call function to complete edit process
     if (isEdit) {
-    var taskId = formEl.getAttribute("data-task-id");
-    completeEditTask(taskNameInput, taskTypeInput, taskId);
-     } 
+        var taskId = formEl.getAttribute("data-task-id");
+        completeEditTask(taskNameInput, taskTypeInput, taskId);
+    } 
      // no data attribute, so create object as normal and pass to createTaskEl function
-        else {
+    else {
         var taskDataObj = {
          name: taskNameInput,
         type: taskTypeInput
     }
-    };
-  
+    //send it as an argument to createTaskEl
     createTaskEl(taskDataObj);
-  };
+}}
 
 var createTaskEl = function(taskDataObj){
     var listItemEl = document.createElement("li");
     listItemEl.className = "task-item";
     
     //add task id as a custom attribute
-    listItemEl.setAttribute("data-task-id", taskIdCounter)
+    listItemEl.setAttribute("data-task-id", taskIdCounter);
 
     //create div to hold task info and add to list item
     var taskInfoEl = document.createElement("div");
@@ -77,6 +73,7 @@ var createTaskEl = function(taskDataObj){
 
     //increase task counter for the next unique id
     taskIdCounter++;
+    saveTasks();
 };
 
 var completeEditTask = function(taskName, taskType, taskId) {
@@ -96,7 +93,9 @@ var completeEditTask = function(taskName, taskType, taskId) {
         if (tasks[i].id === parseInt(taskId)) {
         tasks[i].name = taskName;
         tasks[i].type = taskType;
-    }
+        } 
+    }  
+    saveTasks();
 };
 
 var taskStatusChangeHandler = function(event) {
@@ -110,21 +109,21 @@ var taskStatusChangeHandler = function(event) {
     var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
     if (statusValue === "to do") {
         tasksToDoEl.appendChild(taskSelected);
-      } 
-      else if (statusValue === "in progress") {
+    } 
+    else if (statusValue === "in progress") {
         tasksInProgressEl.appendChild(taskSelected);
-      } 
-      else if (statusValue === "completed") {
+    } 
+    else if (statusValue === "completed") {
         tasksCompletedEl.appendChild(taskSelected);
-      }
-      // update task's in tasks array
+    }
+    // update task's in tasks array
     for (var i = 0; i < tasks.length; i++) {
         if (tasks[i].id === parseInt(taskId)) {
         tasks[i].status = statusValue;
         }
     }
-
-  };
+    saveTasks();
+}
 
 var createTaskActions = function(taskId) {
     var actionContainerEl = document.createElement("div");
@@ -163,7 +162,7 @@ var createTaskActions = function(taskId) {
     }
 
     return actionContainerEl;
-}
+};
 
 formEl.addEventListener("submit", taskFormHandler);
 
@@ -185,7 +184,9 @@ var deleteTask = function(taskId) {
     // reassign tasks array to be the same as updatedTaskArr
     tasks = updatedTaskArr;
 
-  };
+    saveTasks();
+
+};
 
   var editTask = function(taskId) {
     
@@ -204,7 +205,7 @@ var deleteTask = function(taskId) {
     
 };
 
-  var taskButtonHandler = function(event) {
+var taskButtonHandler = function(event) {
     // get target element from event
     var targetEl = event.target;
   
@@ -218,7 +219,10 @@ var deleteTask = function(taskId) {
       var taskId = targetEl.getAttribute("data-task-id");
       deleteTask(taskId);
     }
-  };
+};
+var saveTasks = function() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }
 
 pageContentEl.addEventListener("click", taskButtonHandler);
 pageContentEl.addEventListener("change", taskStatusChangeHandler);
